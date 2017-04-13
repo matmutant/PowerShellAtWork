@@ -1,12 +1,22 @@
 #The aim of this PowerShell script is to copy a timestamped file (in name) to a directory where only the 3 most recent copies will be kept (sorted by timestamped name using alpha order)
 #The source file should be named BACK_YYYYMMDD_HHmm.xls to make sure the most recent files are at the end of the generated array
 #Make sure there is ONLY the file of interest in the Source or you'll get in trouble.
-#Sets the source directory:
+#Set the source and target directories using the parameters:
 #Note: don't put a trailing \ at the end of the path
-$sdir = ".\data_Source"
-#Sets the target directory
-#Note: don't put a trailing \ at the end of the path
-$tdir = ".\data_Target"
+#Note: use ABSOLUTE path if you ever want to use task scheduler to launch the script
+#Use parameters for source $sdir and target $tdir as following:
+# .\BackupAndVersXLS.ps1 -sdir ".\data_Source" -tdir ".\data_Target"
+Param
+(
+	[string]$sdir,
+	[string]$tdir
+)
+if (($sdir -like "") -or ($tdir -like "")) {
+	"MISSING arguments -sdir and -tdir"
+	"Use parameter for source $sdir and target $tdir as following:"
+	'".\BackupAndVersXLS.ps1 -sdir ".\data_Source" -tdir ".\data_Target"'
+	exit
+}
 #Source filename is set by scanning the folder for the .xls file:
 $source = Get-ChildItem "$sdir" -Name -Filter *.xls
 #The script logs everything in log.txt
@@ -42,3 +52,5 @@ else {
 		Add-Content $tdir\log.txt "$(Get-Date) - Deletion aborted, reason: not enough backup files"
 	}
 }
+#enable sleep for debugging purpose
+Start-Sleep -s 10
