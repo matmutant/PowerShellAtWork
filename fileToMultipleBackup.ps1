@@ -1,30 +1,45 @@
 #LICENSE: Creative Commons CC-BY-SA.
-#Script Written by matmutant
+#Script Written by Mathieu GRIVOIS
 #The aim of this PowerShell script is to copy a timestamped file (in name) to a directory where only the $nkeep most recent copies will be kept (sorted by timestamped name using alpha order)
 #The source file should be named BACK_YYYYMMDD_HHmm.foo to make sure the most recent files are at the end of the generated array
 #Make sure there is ONLY the file of interest in the Source or you'll get in trouble.
 #Set the source and target directories and file extension using the parameters:
 #Note: don't put a trailing \ at the end of the path
 #Note: use ABSOLUTE path if you ever want to use task scheduler to launch the script
-#Use parameters for source $sdir, target $tdir, file extension $filext and nb of file(s) to keep as following:
-# .\BackupAndVersXLS.ps1 -sdir ".\data_Source" -tdir ".\data_Target" -filext "csv" -nkeep 3
+#Use parameters for source, target, file extension and nb of file(s) to keep in $iniFile
+#
 Param
 (
-	[string]$sdir,
-	[string]$tdir,
-	[string]$filext,
-	[int]$nkeep
+	[string]$iniFile
 )
+Get-Content $iniFile |
+foreach-object -begin {$hashIni=@{}} -process {
+	$k = [regex]::split($_,'=')
+	if(($k[0].CompareTo("") -ne 0) -and ($k[0].StartsWith("[") -ne $True) -and ($k[0].StartsWith("#") -ne $True)) {
+		$hashIni.Add($k[0], $k[1])
+	} 
+}
+#push ini parameters to existing variables (legacy support)
+$sdir = $hashIni.sourceDirectory
+$tdir = $hashIni.targetDirectory
+$filext = $hashIni.fileExtension
+$nkeep = $hashIni.nbFileToKeep
 #display parameters for debugging 
 "parameters passed to script:"
-"source dir: $sdir"
-"target dir: $tdir"
-"file extension: $filext"
-"nb of file(s) to keep in target: $nkeep"
+">>> source dir: $sdir"
+">>> target dir: $tdir"
+">>> file extension: $filext"
+">>> nb of file(s) to keep in target: $nkeep`n"
 if (($sdir -like "") -or ($tdir -like "") -or ($filext -like "") -or ($nkeep -lt 1)) {
-	"MISSING or INVALID arguments -sdir, -tdir, -filext or -kneep"
-	"Use parameter for source $sdir, target $tdir, file extension $filext and nb of file(s) to keep as following:"
-	'".\BackupAndVersXLS.ps1 -sdir ".\data_Source" -tdir ".\data_Target" -filext "csv" -nkeep 3'
+	"`n`r`n`r`nMISSING or INVALID parameters in $iniFile"
+	"Use parameter for source, target, file extension and nb of file(s) to keep as following:"
+	'[workDirectories]'
+	'sourceDirectory=.\data_Source'
+	'targetDirectory=.\data_Target'
+	'[fileExtension]'
+	'fileExtension=csv'
+	'[nbFileToKeep]'
+	'nbFileToKeep=3'
 	Start-Sleep -s 10
 	exit
 }
