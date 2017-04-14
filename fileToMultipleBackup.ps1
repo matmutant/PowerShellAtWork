@@ -30,19 +30,23 @@ foreach-object -begin {$hashIni=@{}} -process {
 $sdir = $hashIni.sourceDirectory
 $tdir = $hashIni.targetDirectory
 $filext = $hashIni.fileExtension
+$logfile = $hashIni.logFile
 $nkeep = $hashIni.nbFileToKeep
 #displays parameters for debugging 
 "parameters passed to script:"
 ">>> source dir: $sdir"
 ">>> target dir: $tdir"
+">>> log filename: $logfile"
 ">>> file extension: $filext"
 ">>> nb of file(s) to keep in target: $nkeep`n"
-if (($sdir -like "") -or ($tdir -like "") -or ($filext -like "") -or ($nkeep -lt 1)) {
+if (($sdir -like "") -or ($tdir -like "") -or ($filext -like "") -or ($logfile -like "") -or ($nkeep -lt 1)) {
 	"`n`r`n`r`nMISSING or INVALID parameters in $iniFile"
 	"Use parameter for source, target, file extension and nb of file(s) to keep as following:"
 	'[workDirectories]'
 	'sourceDirectory=.\data_Source'
 	'targetDirectory=.\data_Target'
+	'[logFileName]'
+	'logFile=logfile.log'
 	'[fileExtension]'
 	'fileExtension=csv'
 	'[nbFileToKeep]'
@@ -52,19 +56,19 @@ if (($sdir -like "") -or ($tdir -like "") -or ($filext -like "") -or ($nkeep -lt
 }
 #Source filename is set by scanning the folder for the .$filext file:
 $source = Get-ChildItem "$sdir" -Name -Filter *.$filext
-#The script logs everything in fileToMultipleBackup.log
-Add-Content $tdir\fileToMultipleBackup.log "`r`n`r`n`r`n$(Get-Date) - Started Copying and Cleaning processs"
+#The script logs everything in $logfile
+Add-Content $tdir\$logfile "`r`n`r`n`r`n$(Get-Date) - Started Copying and Cleaning processs"
 #checks if there is only one single file listed.
 if ($source.Count -ne 1) {
 	"Aborted, there is not only one file of interest in there."
-	Add-Content $tdir\fileToMultipleBackup.log "$(Get-Date) - Copy aborted, reason: 0 or more than 1 file in source."
+	Add-Content $tdir\$logfile "$(Get-Date) - Copy aborted, reason: 0 or more than 1 file in source."
 }
 else {
 	#Copies the source *.$filext from source directory to target directory
 	"Copying process:"
 	">>> Copying $source file to folder"
 	Copy-Item $sdir\$source $tdir\
-	Add-Content $tdir\fileToMultipleBackup.log "$(Get-Date) - Copied $source from source directory"
+	Add-Content $tdir\$logfile "$(Get-Date) - Copied $source from source directory"
 	#Starts the cleaning process
 	$a = Get-ChildItem "$tdir" -Name -Filter *.$filext
 	"Deletion process:"
@@ -78,13 +82,13 @@ else {
 		$b = ($a.Count-$n)
 		Foreach ($filebak in $a[0..$b]) {
 			">>> deleting: $filebak"
-			Add-Content $tdir\fileToMultipleBackup.log "$(Get-Date) - Deleted $filebak from target directory, kept $nkeep backup(s)"
+			Add-Content $tdir\$logfile "$(Get-Date) - Deleted $filebak from target directory, kept $nkeep backup(s)"
 			Remove-Item $tdir\$filebak
 		}
 	}
 	else {
 		">>> Deletion aborted, there is at most $nkeep files in the directory. Keep Yo Backup!"
-		Add-Content $tdir\fileToMultipleBackup.log "$(Get-Date) - Deletion aborted, reason: not enough backup files"
+		Add-Content $tdir\$logfile "$(Get-Date) - Deletion aborted, reason: not enough backup files"
 	}
 }
 #enable sleep for debugging purpose

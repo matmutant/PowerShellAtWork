@@ -30,16 +30,20 @@ foreach-object -begin {$hashIni=@{}} -process {
 $tdir = $hashIni.targetDirectory
 $filext = $hashIni.fileExtension
 $nkeep = $hashIni.nbFileToKeep
+$logfile = $hashIni.logFile
 #displays parameters for debugging 
 "parameters passed to script:"
 ">>> target dir: $tdir"
+">>> log filename: $logfile"
 ">>> file extension: $filext"
 ">>> nb of file(s) to keep in target: $nkeep`n"
-if (($tdir -like "") -or ($filext -like "") -or ($nkeep -lt 1)) {
+if (($tdir -like "") -or ($filext -like "") -or ($logfile -like "") -or ($nkeep -lt 1)) {
 	"`n`r`n`r`nMISSING or INVALID parameters in $iniFile"
 	"Use parameter for source, target, file extension and nb of file(s) to keep as following:"
 	'[workDirectory]'
 	'targetDirectory=.\data_Target'
+	'[logFileName]'
+	'logFile=logfile.log'
 	'[fileExtension]'
 	'fileExtension=csv'
 	'[nbFileToKeep]'
@@ -47,8 +51,8 @@ if (($tdir -like "") -or ($filext -like "") -or ($nkeep -lt 1)) {
 	Start-Sleep -s 10
 	exit
 }
-#The script logs everything in deleteAllButN.log
-Add-Content $tdir\deleteAllButN.log "`r`n`r`n`r`n$(Get-Date) - Started Cleaning processs"
+#The script logs everything in $logfile
+Add-Content $tdir\$logfile "`r`n`r`n`r`n$(Get-Date) - Started Cleaning processs"
 #Starts the cleaning process
 $a = Get-ChildItem "$tdir" -Name -Filter *.$filext
 "Deletion process:"
@@ -62,13 +66,13 @@ if ($a.Count -ge $n) {
 	$b = ($a.Count-$n)
 	Foreach ($filebak in $a[0..$b]) {
 		">>> deleting: $filebak"
-		Add-Content $tdir\deleteAllButN.log "$(Get-Date) - Deleted $filebak from target directory, kept $nkeep backup(s)"
+		Add-Content $tdir\$logfile "$(Get-Date) - Deleted $filebak from target directory, kept $nkeep backup(s)"
 		Remove-Item $tdir\$filebak
 	}
 }
 else {
 	">>> Deletion aborted, there is at most $nkeep files in the directory. Keep Yo Backup!"
-	Add-Content $tdir\deleteAllButN.log "$(Get-Date) - Deletion aborted, reason: not enough backup files"
+	Add-Content $tdir\$logfile "$(Get-Date) - Deletion aborted, reason: not enough backup files"
 }
 #enable sleep for debugging purpose
 Start-Sleep -s 10
