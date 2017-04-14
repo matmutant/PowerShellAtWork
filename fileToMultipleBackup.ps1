@@ -1,5 +1,5 @@
 #LICENSE: Creative Commons CC-BY-SA.
-#Script Written by Mathieu GRIVOIS
+#Script Written by matmutant
 #The aim of this PowerShell script is to copy a timestamped file (in name) to a directory where only the $nkeep most recent copies will be kept (sorted by timestamped name using alpha order)
 #The source file should be named BACK_YYYYMMDD_HHmm.foo to make sure the most recent files are at the end of the generated array
 #Make sure there is ONLY the file of interest in the Source or you'll get in trouble.
@@ -12,6 +12,13 @@ Param
 (
 	[string]$iniFile
 )
+#Checks if iniFile parameter is set or exist
+$ifExist = Test-Path $iniFile
+if (($iniFile -like "") -or ($ifExist -eq $false)) {
+	"`n`r`n`r`nMISSING or INVALID parameter: -iniFile"
+	Start-Sleep -s 10
+	exit
+}
 Get-Content $iniFile |
 foreach-object -begin {$hashIni=@{}} -process {
 	$k = [regex]::split($_,'=')
@@ -19,12 +26,12 @@ foreach-object -begin {$hashIni=@{}} -process {
 		$hashIni.Add($k[0], $k[1])
 	} 
 }
-#push ini parameters to existing variables (legacy support)
+#pushes ini parameters to existing variables (legacy support)
 $sdir = $hashIni.sourceDirectory
 $tdir = $hashIni.targetDirectory
 $filext = $hashIni.fileExtension
 $nkeep = $hashIni.nbFileToKeep
-#display parameters for debugging 
+#displays parameters for debugging 
 "parameters passed to script:"
 ">>> source dir: $sdir"
 ">>> target dir: $tdir"
