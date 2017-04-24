@@ -35,7 +35,7 @@ foreach-object -process {
 ">>> log filename: $logFile"
 ">>> file extension: $fileExtension"
 ">>> nb of file(s) to keep in target: $nbFileToKeep`n"
-if (($sourceDirectory -like "") -or ($targetDirectory -like "") -or ($fileExtension -like "") -or ($logFile -like "") -or ($nbFileToKeep -lt 1)) {
+if (($sourceDirectory -like "") -or ($targetDirectory -like "") -or ($fileExtension -like "") -or ($logFile -like "") -or ([int]$nbFileToKeep -lt 1)) {
 	"`n`r`n`r`nMISSING or INVALID parameters in $iniFile"
 	"Use parameter for source, target, file extension and nb of file(s) to keep as following:"
 	'[workDirectories]'
