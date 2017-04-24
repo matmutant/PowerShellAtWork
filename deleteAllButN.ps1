@@ -21,17 +21,12 @@ if (($iniFile -like "") -or ($ifExist -eq $false)) {
 }
 #grabs ini content and push it to hash table
 Get-Content $iniFile |
-foreach-object -begin {$hashIni=@{}} -process {
+foreach-object -process {
 	$k = [regex]::split($_,'=')
 	if(($k[0].CompareTo("") -ne 0) -and ($k[0].StartsWith("[") -ne $True) -and ($k[0].StartsWith("#") -ne $True)) {
-		$hashIni.Add($k[0], $k[1])
+		New-Variable -Name $k[0] -Value $k[1]
+		#Get-Variable -Name $k[0] -ValueOnly
 	} 
-}
-#extracts hashtable content as many simple variables
-foreach ($var in $hashIni.keys.GetEnumerator()) {
-	$var
-	New-Variable -Name "$var" -Value $hashIni.$var
-	Get-Variable -Name "$var" -ValueOnly
 }
 #displays parameters for debugging 
 "parameters passed to script:"
