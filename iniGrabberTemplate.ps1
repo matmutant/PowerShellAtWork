@@ -1,7 +1,7 @@
 #LICENSE: Creative Commons CC-BY-SA.
 #Script Written by matmutant
 #built using SS64 and powershelladmin.com
-#This is a small template to use ini file to store parameters, push the iniFile content to a hastable and then extract that content to obtain simple variables (as in my use case hastable.key variables don't work at some point)
+#This is a small template to use ini file to store parameters, and use them as simple variables
 Param
 (
 	[string]$iniFile
@@ -13,18 +13,13 @@ if (($iniFile -like "") -or ($ifExist -eq $false)) {
 	Start-Sleep -s 10
 	exit
 }
-#grabs ini content and push it to hash table
+#grabs ini content and push it to variables
 Get-Content $iniFile |
-foreach-object -begin {$h=@{}} -process {
+foreach-object -process {
 	$k = [regex]::split($_,'=')
 	if(($k[0].CompareTo("") -ne 0) -and ($k[0].StartsWith("[") -ne $True) -and ($k[0].StartsWith("#") -ne $True)) {
-		$h.Add($k[0], $k[1])
+		New-Variable -Name $k[0] -Value $k[1]
+		#Get-Variable -Name $k[0] -ValueOnly
 	} 
-}
-#extracts hashtable content as many simple variables
-foreach ($var in $h.keys.GetEnumerator()) {
-	$var
-	New-Variable -Name "$var" -Value $h.$var
-	Get-Variable -Name "$var" -ValueOnly
 }
 #now any variable declared in the iniFile can be used in the script 'as is'.
