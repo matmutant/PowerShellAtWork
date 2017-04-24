@@ -59,9 +59,7 @@ Add-Content $targetDirectory\$logFile "`r`n`r`n`r`n$(Get-Date) - Started Cleanin
 $a = Get-ChildItem "$targetDirectory" -Name -Filter *.$fileExtension
 "Deletion process:"
 #note that arrays start at 0...
-$a.count
 $n = [int]$nbFileToKeep + 1
-$n
 #$a.Count -ge $n ==> checks if there are at least $nbFileToKeep files in the directory
 if ($a.Count -ge $n) {
 	">>> This will delete every single *.$fileExtension present in the directory but the $nbFileToKeep latest ones, sorted by name."
