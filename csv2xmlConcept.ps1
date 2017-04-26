@@ -27,8 +27,9 @@ foreach ($csv in $content.values.getEnumerator()) {
 	"Full regex : `n`'^$C4$s$N6$s$Cf35$s$Cf35$s$Cf14$s$C1$s$C13$s$N6$s$Cf35$s(.*)`'`n"
 	"result:"
 	$workVar = [regex]::Replace($csv, "^$C4$s$N6$s$Cf35$s$Cf35$s$Cf14$s$C1$s$C13$s$N6$s$Cf35$s(.*)", $template)
-	#removes empty tags
-	$workVar = $workVar -replace '><[a-zA-Z0-9]*></[a-zA-Z0-9]*><', '><'
-	#adds line breaks
-	$workVar -replace '><',">`r`n<"
+	#removes empty tags & adds line breaks
+	$workVar | %{
+		$_ -replace '><[a-zA-Z0-9]*></[a-zA-Z0-9]*><', '><' `
+		   -replace '><',">`r`n<"
+		}
 }
