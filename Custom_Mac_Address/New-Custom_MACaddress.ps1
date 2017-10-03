@@ -39,24 +39,28 @@
 #    releasing/renewing its DHCP lease after making any changes.
 #
 #.Example 
-#    new-macaddress.ps1
+#    .\New-Custom_MACaddress.ps1
 #
 #    This will select a random MAC address with a valid vendor ID number, and
 #    either assign the MAC to the sole physical interface, or, if there are
 #    multiple interfaces, prompt the user to select the desired interface.
 #
 #.Example 
-#    new-macaddress.ps1 -resetdefault 
+#    .\New-Custom_MACaddress.ps1 -resetdefault 
 #
 #    Registry value for the custom MAC will be deleted.  The built-in MAC
 #    of the NIC will be used instead, which is the factory default.
 #
 #.Example 
-#    new-macaddress.ps1 -donotresetinterface
+#    .\New-Custom_MACaddress.ps1 -donotresetinterface
 #
 #    The modified interface will not be disabled and enabled, nor will its
 #    DHCP lease be released and renewed.  The registry value for the MAC
 #    address will still be modified however.
+#.Example 
+#    .\New-Custom_MACaddress.ps1 -InterfaceIndexNumber 16 -SpoofedMacAddress 0024E8254384
+#
+#    This will set the given MAC (0024E8254384) for the adapter with given Index (16)
 #
 #Requires -Version 2.0 
 #
